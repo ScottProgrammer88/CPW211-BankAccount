@@ -36,23 +36,31 @@ namespace BankAccount
         public double Balance { get; private set; } // private set means that the Balance property can only be set from within the Account class.
 
         /// <summary>
-        /// Deposits the specified amount into the account.
+        /// Deposits the specified amount into the account. Returns the new balance
         /// </summary>
         /// <param name="amt">The positive amount to deposit</param>
-        public void Deposit(double amt)
+        /// <returns>The new balance after the deposit</returns>
+        public double Deposit(double amt)
         {
-            throw new NotImplementedException();
+            if (amt <= 0)
+            {
+                throw new ArgumentOutOfRangeException($"The {nameof(amt)} must be must be more than 0");
+            }
+
+            Balance += amt;
+            return Balance;
         }
 
-
         /// <summary>
-        /// Withdraws the specified amount from the balance.
+        /// Withdraws the specified amount from the balance and returns the balance.
         /// The Withdraw method is used to withdraw money from the account.
         /// </summary>
-        /// <param name="amt">The positive amount of money to be taken from the balance</param>
-        public void Withdraw(double amt)
+        /// <param name="amount">The positive amount of money to be taken from the balance</param>
+        /// <returns>The new balance after the withdrawal</returns>
+        public double Withdraw(double amount)
         {
-            throw new NotImplementedException();
+            Balance -= amount;
+            return Balance;
         }
     }
 }
