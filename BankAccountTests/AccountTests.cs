@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
+using System.ComponentModel;
+using System.Dynamic;
 
 namespace BankAccount.Tests
 {
@@ -88,24 +90,50 @@ namespace BankAccount.Tests
         }
 
         [TestMethod]
-        public void Withdraw_PositiveAmount_ReturnsUpdatedBalance()
+        [DataRow(100, 50)]
+        [DataRow(100, .99)]
+        public void Withdraw_PositiveAmount_ReturnsUpdatedBalance(double initialDeposit,
+                                                                double withdrawalAmount)
         {
-            Assert.Fail();
+            // Arrange
+            double expectedBalance = initialDeposit - withdrawalAmount;
+            acc.Deposit(initialDeposit);
+
+            // Act
+            double returnedBalance = acc.Withdraw(withdrawalAmount);
+
+            // Assert
+            Assert.AreEqual(expectedBalance, returnedBalance); // Verify that the Withdraw method decreases the balance by the correct amount.
         }
 
+
+        /// <summary>
+        /// public void Withdraw_ZeroOrLess_ThrowsArgumentOutOfRangeException(double withdrawAmount): This is the test method itself. 
+        /// It takes a double parameter named withdrawAmount, which will be filled by the values from the DataRow attributes.
+        /// The purpose of this method is to test whether the Withdraw method in the Account class correctly throws an
+        /// ArgumentOutOfRangeException when the withdrawAmount is zero or negative. Assert.ThrowsException<ArgumentOutOfRangeException>(() => acc.Withdraw(withdrawAmount));
+        /// This line asserts that calling the Withdraw method with the provided withdrawAmount will throw an ArgumentOutOfRangeException.The Assert.ThrowsException<T> method
+        /// is used to verify that a specific type of exception (ArgumentOutOfRangeException) is thrown when the code inside the lambda expression (() => acc.Withdraw(withdrawAmount)) is executed.
+        /// This line checks if the Withdraw method crashes correctly when you try to take out zero or a negative amount of money. If it doesn’t throw the right error, the test will fail, meaning there’s a bug in your code.
+        /// </summary>
+        /// <param name="withdrawAmount"></param>
         [TestMethod]
         [DataRow(0)] // Test a zero withdrawal amount
         [DataRow(-.01)] // Test a negative withdrawal amount
         [DataRow(-1000)]
-        public void Withdraw_ZeroOrLess_ThrowsArgumentOutOfRangeException()
+        public void Withdraw_ZeroOrLess_ThrowsArgumentOutOfRangeException(double withdrawAmount) // The data that is passed in from the DataRow attribute.
         {
-            Assert.Fail();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => acc.Withdraw(withdrawAmount)); // Verify that the Withdraw method throws an ArgumentOutOfRangeException.  
         }
 
         [TestMethod]
         public void Withdraw_MoreThanAvailableBalance_ThrowsArgumentException()
         {
-            Assert.Fail();
+            // Arrange
+            double withdrawAmount = 100;
+            
+            // Assert
+            Assert.ThrowsException<ArgumentException>(() => acc.Withdraw(withdrawAmount)); // Verify that the Withdraw method throws an ArgumentException.
         }
 
         [TestMethod]
@@ -125,11 +153,37 @@ namespace BankAccount.Tests
             // Assert
             Assert.AreEqual(expectedBalance, actualBalance); // Verify that the Withdraw method decreases the balance by the correct amount.
         }
+
+        [TestMethod]
+        public void Owner_SetAsNull_ThrowsArgumentNullException()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => acc.Owner = null); // Verify that the Owner property throws an ArgumentNullException.   
+        }
+
+        [TestMethod]
+        public void Owner_SetAsWhiteSpaceOrEmptyString_ThrowsArgumentException()
+        {
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = String.Empty);
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = "   ");
+        }
+
+        [TestMethod]
+        [DataRow("Joe")]
+        [DataRow("Joe Ortiz")]
+        [DataRow("Joseph Jo Smithfield")]
+        public void Owner_SetAsUpTo20Characters_SetsSuccessfully(string ownerName)
+        {
+            acc.Owner = ownerName;
+            Assert.AreEqual(ownerName, acc.Owner);
+        }
+
+        [TestMethod]
+        [DataRow("Joseph Jo Smithfield Jr.")]
+        [DataRow("Joe 3rd")]
+        [DataRow("#$%$")]
+        public void Owner_InvalidOwnerName_ThrowsArgumentException(string ownerName)
+        {
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = ownerName);
+        }
     }
 }
-
-
-// withdrawing a positive amount - returns an updated balance
-// withdrawing a negative amount - throws ArgumentOutOfRangeException
-// withdrawing more than the available balance - ArgumentException  
-// withdrawing 0 - throws ArgumentOutOfRangeException
