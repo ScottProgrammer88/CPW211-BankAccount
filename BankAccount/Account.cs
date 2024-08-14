@@ -59,8 +59,17 @@ namespace BankAccount
         /// <returns>The new balance after the withdrawal</returns>
         public double Withdraw(double amount)
         {
-            Balance -= amount;
-            return Balance;
+            if (amount > Balance)
+            {
+                throw new ArgumentException($"{nameof(amount)} cannot be greater than {nameof(Balance)}");
+            }
+
+            if (amount <= 0)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(amount)} must be greater than 0");
+            }
+            Balance -= amount; // subtract the amount from the balance
+            return Balance; // return the new balance after the withdrawal
         }
     }
 }
