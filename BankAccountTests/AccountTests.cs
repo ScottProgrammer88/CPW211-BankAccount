@@ -153,11 +153,37 @@ namespace BankAccount.Tests
             // Assert
             Assert.AreEqual(expectedBalance, actualBalance); // Verify that the Withdraw method decreases the balance by the correct amount.
         }
+
+        [TestMethod]
+        public void Owner_SetAsNull_ThrowsArgumentNullException()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => acc.Owner = null); // Verify that the Owner property throws an ArgumentNullException.   
+        }
+
+        [TestMethod]
+        public void Owner_SetAsWhiteSpaceOrEmptyString_ThrowsArgumentException()
+        {
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = String.Empty);
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = "   ");
+        }
+
+        [TestMethod]
+        [DataRow("Joe")]
+        [DataRow("Joe Ortiz")]
+        [DataRow("Joseph Jo Smithfield")]
+        public void Owner_SetAsUpTo20Characters_SetsSuccessfully(string ownerName)
+        {
+            acc.Owner = ownerName;
+            Assert.AreEqual(ownerName, acc.Owner);
+        }
+
+        [TestMethod]
+        [DataRow("Joseph Jo Smithfield Jr.")]
+        [DataRow("Joe 3rd")]
+        [DataRow("#$%$")]
+        public void Owner_InvalidOwnerName_ThrowsArgumentException(string ownerName)
+        {
+            Assert.ThrowsException<ArgumentException>(() => acc.Owner = ownerName);
+        }
     }
 }
-
-
-// withdrawing a positive amount - returns an updated balance
-// withdrawing a negative amount - throws ArgumentOutOfRangeException
-// withdrawing more than the available balance - ArgumentException  
-// withdrawing 0 - throws ArgumentOutOfRangeException
